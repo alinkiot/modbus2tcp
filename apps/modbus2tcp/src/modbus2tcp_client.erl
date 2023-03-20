@@ -37,7 +37,7 @@ loop(Num, Sock) ->
     Timeout = 5000 + rand:uniform(5000),
     receive
         {tcp, Sock, Data} ->
-            io:format("Client ~w received: ~s~n", [Num, Data]),
+            io:format("Client ~w received: ~s~n", [Num, binary:encode_hex(Data)]),
             gen_server:call(whereis(modbus), {modbus, Data}),
             loop(Num, Sock);
         {tcp_closed, Sock} ->
