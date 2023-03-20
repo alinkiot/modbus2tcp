@@ -1,0 +1,6 @@
+-sname modbus2tcp
+
+-setcookie modbus2tcp_cookie
+
++K true
++A30
