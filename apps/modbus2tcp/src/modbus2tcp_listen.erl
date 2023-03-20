@@ -56,10 +56,10 @@ handle_call(_Request, _From, State) ->
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
-handle_info({tcp, Sock, Data}, State = #state{transport = Transport, socket = Sock}) ->
+handle_info({tcp, Sock, Data}, State = #state{transport = Transport, socket = Sock, from = From }) ->
     {ok, Peername} = Transport:peername(Sock),
     io:format("Data from ~s: ~s~n", [esockd:format(Peername), Data]),
-    gen_server:reply(State#state.from, {ok, Data}),
+    From =/= undefined andalso gen_server:reply(State#state.from, {ok, Data}),
     Transport:setopts(Sock, [{active, once}]),
     {noreply, State#state{ from = undefined }};
 
