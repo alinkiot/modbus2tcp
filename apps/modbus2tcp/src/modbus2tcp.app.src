@@ -5,7 +5,8 @@
   {mod, {modbus2tcp_app, []}},
   {applications,
    [kernel,
-    stdlib
+    stdlib,
+    esockd
    ]},
   {env,[]},
   {modules, []},

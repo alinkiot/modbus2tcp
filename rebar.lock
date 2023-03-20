@@ -1,0 +1,8 @@
+{"1.2.0",
+[{<<"esockd">>,{pkg,<<"esockd">>,<<"5.8.2">>},0}]}.
+[
+{pkg_hash,[
+ {<<"esockd">>, <<"B63BC8989B9094716F9BF38C853F6B146AC59A4F9DC0298CD6B09AAB93F0314A">>}]},
+{pkg_hash_ext,[
+ {<<"esockd">>, <<"230A2CF80A8F68450D244E6D70AD65CD7A00A481E9628B5FA432540882B94D51">>}]}
+].
