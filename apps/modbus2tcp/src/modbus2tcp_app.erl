@@ -10,9 +10,7 @@
 -export([start/2, stop/1]).
 
 start(_StartType, _StartArgs) ->
-    {ok, Sup} = modbus2tcp_sup:start_link(),
-    modbus2tcp_listen:start(modbus, 3400),
-    {ok, Sup}.
+    modbus2tcp_sup:start_link().
 
 stop(_State) ->
     ok.

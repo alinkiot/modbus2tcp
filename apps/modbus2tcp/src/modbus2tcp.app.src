@@ -8,7 +8,9 @@
     stdlib,
     esockd
    ]},
-  {env,[]},
+  {env,[
+   {modbus, [{host, "556116h88u.goho.co"}, {port, 46256}]}
+  ]},
   {modules, []},
 
   {licenses, ["Apache 2.0"]},

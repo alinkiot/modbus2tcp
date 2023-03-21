@@ -3,7 +3,7 @@
 %% @end
 %%%-------------------------------------------------------------------
 
--module(modbus2tcp_sup).
+-module(modbus2tcp_modbus_sup).
 
 -behaviour(supervisor).
 
@@ -26,23 +26,16 @@ start_link() ->
 %%                  type => worker(),       % optional
 %%                  modules => modules()}   % optional
 init([]) ->
-    SupFlags = #{strategy => one_for_one,
+    SupFlags = #{strategy => simple_one_for_one,
                  intensity => 0,
                  period => 1},
     ChildSpecs = [#{
-        id => modbus2tcp_dtu_sup,
-        start => {modbus2tcp_dtu_sup, start_link, []},
+        id => modbus2tcp_modbus,
+        start => {modbus2tcp_modbus, start_link, []},
         restart => transient,
         shutdown => 2000,
-        type => supervisor,
-        modules => [modbus2tcp_dtu_sup]
-    },#{
-        id => modbus2tcp_modbus_sup,
-        start => {modbus2tcp_modbus_sup, start_link, []},
-        restart => transient,
-        shutdown => 2000,
-        type => supervisor,
-        modules => [modbus2tcp_modbus_sup]
+        type => worker,
+        modules => [modbus2tcp_modbus]
     }],
     {ok, {SupFlags, ChildSpecs}}.
 
