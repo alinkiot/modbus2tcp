@@ -131,7 +131,7 @@ connect(#state{host = Addr, port = Port } = State) ->
             DevId = list_to_binary(io_lib:format("~6.10.0B", [1])),
             Dk = <<"P5sPmWfR">>,
             Ds = <<"4xXJZXE76bjANsFK">>,
-            Command = <<"reg,1,", DevId/binary, ",", Dk/binary, ",", Ds/binary, "\r\n">>,
+            Command = <<"reg,1,", DevId/binary, ",", Dk/binary, ",", Ds/binary, "\\r\\n">>,
             case do_sync_command(Socket, Command) of
                 ok ->
                     {ok, State#state{socket = Socket}};
@@ -158,6 +158,7 @@ do_sync_command(Socket, Command) ->
     ok = inet:setopts(Socket, [{active, false}]),
     case gen_tcp:send(Socket, Command) of
         ok ->
+            io:format("Send: ~p~n", [Command]),
 %%            case gen_tcp:recv(Socket, 0, ?RECV_TIMEOUT) of
 %%                {ok, Data} ->
                     ok = inet:setopts(Socket, [{active, once}]),
