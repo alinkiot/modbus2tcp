@@ -32,7 +32,7 @@ init([]) ->
     ChildSpecs = [#{
         id => modbus2tcp_modbus,
         start => {modbus2tcp_modbus, start_link, []},
-        restart => transient,
+        restart => temporary,
         shutdown => 2000,
         type => worker,
         modules => [modbus2tcp_modbus]

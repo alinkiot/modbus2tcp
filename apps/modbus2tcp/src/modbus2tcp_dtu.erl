@@ -33,7 +33,7 @@
 %%
 
 start(Name, Host, Port) ->
-    supervisor:start_child(modbus2tcp_dtu_sup, [Name, Host, Port, 5000, 30000]).
+    supervisor:start_child(modbus2tcp_dtu_sup, [Name, Host, Port, 30000, 5000]).
 
 
 start_link(Name, Host, Port, ReconnectSleep, ConnectTimeout) ->
@@ -53,6 +53,7 @@ stop(Pid) ->
 
 init([Host, Port, ReconnectSleep, ConnectTimeout, SocketOptions]) ->
     {ok, Pid} = modbus2tcp_modbus:start(),
+    erlang:monitor(process, Pid),
     State = #state{host = Host,
         port = Port,
         reconnect_sleep = ReconnectSleep,
@@ -81,6 +82,12 @@ handle_call(_Request, _From, State) ->
 
 handle_cast(_Msg, State) ->
     {noreply, State}.
+
+handle_info({'DOWN', _, process, Pid, Info}, #state{ modbus = Pid } = State) ->
+    io:format("modbus(~p) exit ~p~n", [Pid, Info]),
+    {ok, Pid1} = modbus2tcp_modbus:start(),
+    erlang:monitor(process, Pid1),
+    {noreply, State#state{ modbus = Pid1 }};
 
 handle_info({tcp, Socket, Bs}, #state{socket = Socket} = State) ->
     ok = inet:setopts(Socket, [{active, once}]),
@@ -145,11 +152,10 @@ connect(#state{host = Addr, port = Port } = State) ->
 handle_response(<<"Welcome to the AsyncSocket Echo Server\r\n">>, State) ->
     State;
 handle_response(Data, #state{ modbus = Pid, socket = Socket } = State) ->
-    try
-        {ok, Recv} = modbus2tcp_modbus:send_call(Pid, Data, 5000),
-        gen_tcp:send(Socket, Recv)
-    catch
-        _: Reason ->
+    case modbus2tcp_modbus:send_call(Pid, Data, 5000) of
+        {ok, Recv} ->
+            gen_tcp:send(Socket, Recv);
+        {error, Reason} ->
             io:format("send to modbus error ~p~n", [Reason])
     end,
     State#state{  }.
@@ -158,7 +164,7 @@ do_sync_command(Socket, Command) ->
     ok = inet:setopts(Socket, [{active, false}]),
     case gen_tcp:send(Socket, Command) of
         ok ->
-            io:format("Send: ~p~n", [Command]),
+            io:format("DTU(~p) Send: ~p~n", [self(), Command]),
 %%            case gen_tcp:recv(Socket, 0, ?RECV_TIMEOUT) of
 %%                {ok, Data} ->
                     ok = inet:setopts(Socket, [{active, once}]),

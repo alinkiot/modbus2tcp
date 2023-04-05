@@ -45,7 +45,12 @@ start(Opts) ->
 
 
 send_call(Pid, Data, Timeout) ->
-    gen_server:call(Pid, {request, Data}, Timeout).
+    case is_process_alive(Pid) of
+        true ->
+            gen_server:call(Pid, {request, Data}, Timeout);
+        false ->
+            {error, not_alive}
+    end.
 
 send_cast(Pid, Data) ->
     gen_server:cast(Pid, {request, Data}).
@@ -120,7 +125,7 @@ handle_cast(_Msg, State) ->
 %% Receive data from socket, see handle_response/2. Match `Socket' to
 %% enforce sanity.
 handle_info({tcp, Socket, Bs}, #state{socket = Socket} = State) ->
-    io:format("Modbus Recv:~p~n", [Bs]),
+    io:format("Modbus(~p) Recv: ~p~n", [self(), binary:encode_hex(Bs)]),
     ok = inet:setopts(Socket, [{active, once}]),
     {noreply, handle_response(Bs, State)};
 
@@ -189,7 +194,7 @@ do_request(_Req, _From, #state{socket = undefined} = State) ->
 do_request(Req, From, State) ->
     case gen_tcp:send(State#state.socket, Req) of
         ok ->
-            io:format("Send Succ:~p~n", [Req]),
+            io:format("Modbus(~p) Send: ~p~n", [self(), binary:encode_hex(Req)]),
             NewQueue = queue:in({1, From}, State#state.queue),
             {noreply, State#state{queue = NewQueue}};
         {error, Reason} ->
