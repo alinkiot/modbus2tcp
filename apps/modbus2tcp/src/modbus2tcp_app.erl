@@ -11,7 +11,7 @@
 
 start(_StartType, _StartArgs) ->
     {ok, Sup} = modbus2tcp_sup:start_link(),
-    modbus2tcp_dtu:start(test, "127.0.0.1", 6500),
+    modbus2tcp_dtu:start(test, "cloud.uzyiot.com", 6500),
     {ok, Sup}.
 
 stop(_State) ->

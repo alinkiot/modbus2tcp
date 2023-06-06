@@ -135,9 +135,16 @@ connect(#state{host = Addr, port = Port } = State) ->
     ConnectOptions = [?SOCKET_MODE | SocketOptions],
     case gen_tcp:connect(Addr, Port, ConnectOptions, State#state.connect_timeout) of
         {ok, Socket} ->
-            DevId = list_to_binary(io_lib:format("~6.10.0B", [1])),
-            Dk = <<"P5sPmWfR">>,
-            Ds = <<"4xXJZXE76bjANsFK">>,
+%%            DevId = list_to_binary(io_lib:format("~6.10.0B", [1])),
+%%            DevId = <<"UYZ-000001">>,
+%%            Dk = <<"6d5wZ8As">>,
+%%            Ds = <<"SXazH5AmRx3AcNca">>,
+
+            DevId = <<"ZLWIFI5020001">>,
+            Dk = <<"kNTCkazx">>,
+            Ds = <<"Rkr4MYYwx2HSHZSD">>,
+
+
             Command = <<"reg,1,", DevId/binary, ",", Dk/binary, ",", Ds/binary, "\\r\\n">>,
             case do_sync_command(Socket, Command) of
                 ok ->

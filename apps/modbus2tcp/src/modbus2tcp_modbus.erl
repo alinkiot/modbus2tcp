@@ -47,7 +47,14 @@ start(Opts) ->
 send_call(Pid, Data, Timeout) ->
     case is_process_alive(Pid) of
         true ->
-            gen_server:call(Pid, {request, Data}, Timeout);
+            case catch gen_server:call(Pid, {request, Data}, Timeout) of
+                {'EXIT', {timeout, _}} ->
+                    {error, timeout};
+                {'EXIT', Reason} ->
+                    {error, Reason};
+                Result ->
+                    Result
+            end;
         false ->
             {error, not_alive}
     end.
